@@ -1,0 +1,13 @@
+DELIMITER $$
+
+ALTER DEFINER=`root`@`localhost` EVENT `UpdateDepreciation` ON SCHEDULE EVERY 1 DAY STARTS '2024-04-09 16:59:22' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN
+	     UPDATE ref_kib
+		    SET 
+			accumulated_depreciation = accumulated_depreciation + ((acq_value - residual_value) / useful),
+			book_value = book_value - ((acq_value - residual_value) / useful),
+			dates_depreciation = NOW()
+		    WHERE 
+			 (YEAR(book_date) >= YEAR(NOW()) - useful AND DATE_ADD(IFNULL(dates_depreciation, book_date), INTERVAL 1 YEAR) = NOW());
+	END$$
+
+DELIMITER ;
